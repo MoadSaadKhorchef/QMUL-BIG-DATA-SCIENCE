@@ -14,6 +14,7 @@ def hello():
 def get_uv_data():
     data = retirve_all_data(lat,lng)
     print(data)
+    insert_uv_index(data["Air_Temp_Max"], data["Air_Temp_Min"], data["Wave_Height_Max"], data["Wave_Height_Min"], data["Gust_Max"], data["Gust_Min"], data["Cloud_Cover_Max"], data["Cloud_Cover_Min"], data["Precipitation_Max"], data["Precipitation_Min"], data["UV_Max"])
     #insert_uv_index(uv['result']['uv'], uv['result']['uv_max'], uv['result']['uv_max_time'], uv['result']['uv_time'])
     return data
 
