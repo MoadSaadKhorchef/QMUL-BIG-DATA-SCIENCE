@@ -1,5 +1,6 @@
 from flask import Flask, jsonify, json, request
-from fetch_uv_data import fetch_uv_data
+#from fetch_uv_data import fetch_uv_data
+from fetch_uv_data import 
 from dbase import insert_uv_index, select_data, insert_data
 
 app = Flask(__name__)
@@ -11,10 +12,10 @@ def hello():
 
 @app.route("/api", methods=['GET'])
 def get_uv_data():
-    uv = fetch_uv_data()
-    print(uv['result']['uv'], uv['result']['uv_max'], uv['result']['uv_max_time'], uv['result']['uv_time'])
-    insert_uv_index(uv['result']['uv'], uv['result']['uv_max'], uv['result']['uv_max_time'], uv['result']['uv_time'])
-    return jsonify(uv)
+    data = retirve_all_data(lat,lng)
+    print(data)
+    #insert_uv_index(uv['result']['uv'], uv['result']['uv_max'], uv['result']['uv_max_time'], uv['result']['uv_time'])
+    return data
 
 
 @app.route("/location/<city>/", methods=['GET'])
