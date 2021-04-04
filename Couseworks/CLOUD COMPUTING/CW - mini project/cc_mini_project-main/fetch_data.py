@@ -46,7 +46,7 @@ def fetch_uv_data(lat, lng):
         return resp.reason
     
     
-def retirve_all_data(lat, lng)
+def retirve_all_data(lat, lng):
 
     uv = fetch_uv_data(lat, lng)
     weather_data = get_weather_data(lat, lng)
@@ -73,6 +73,6 @@ def retirve_all_data(lat, lng)
     # the result is a Python dictionary:
     #print(y)
 
-    # retun databin JSON format
+    # retuns datab in JSON format
     return y 
 

@@ -50,6 +50,28 @@ def select_data(name):
 
 
 
+def insert_user(userName, password, role):
+    
+    connection = getConnection()
+    cursor = connection.cursor()
+    query = "INSERT INTO `users` (`Username`, `user_password`, `user_role`) VALUES (%s, %s, %s)"
+    cursor.execute(query, (userName, password, role))
+    connection.commit()
+    connection.close()
+    
+    
+    
+def select_user(userName):
+    
+    connection = getConnection()
+    cursor = connection.cursor()
+    query = "SELECT Username, user_password, user_role FROM users WHERE Username like %s"
+    cursor.execute(query, (userName))
+    #records = cursor.fetchall() # (())
+    account = cursor.fetchone()
+    connection.close()
+    return account
+
 if __name__ == '__main__':
     # insert_uv_index(uv=1, uv_max=2, uv_max_time=3, uv_time=4)
     select_data('Reading')

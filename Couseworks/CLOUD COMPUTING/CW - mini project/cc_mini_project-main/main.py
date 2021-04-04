@@ -1,40 +1,32 @@
-from flask import Flask, jsonify, json, request
-#from fetch_uv_data import fetch_uv_data
-from fetch_uv_data import 
-from dbase import insert_uv_index, select_data, insert_data
+from flask import Flask, jsonify, request
+from fetch_uv_data import fetch_uv_data, retrieve_data
+from dbase import select_data, insert_data, delete_record, modify_record, select_user, insert_user
+from flask_httpauth import HTTPBasicAuth
+from werkzeug.security import generate_password_hash, check_password_hash
+
 
 app = Flask(__name__)
+auth = HTTPBasicAuth()
+role = ''
 
-@app.route("/")
-def hello():
-    html = "<h1>Hello from {name}!</h1>\nGoto /api to fetch UV data".format(name="Mehwish") 
-    return html
-
-@app.route("/api", methods=['GET'])
-def get_uv_data():
-    data = retirve_all_data(lat,lng)
-    print(data)
-    insert_uv_index(data["Air_Temp_Max"], data["Air_Temp_Min"], data["Wave_Height_Max"], data["Wave_Height_Min"], data["Gust_Max"], data["Gust_Min"], data["Cloud_Cover_Max"], data["Cloud_Cover_Min"], data["Precipitation_Max"], data["Precipitation_Min"], data["UV_Max"])
-    #insert_uv_index(uv['result']['uv'], uv['result']['uv_max'], uv['result']['uv_max_time'], uv['result']['uv_time'])
-    return data
-
-
+# GET
 @app.route("/location/<city>/", methods=['GET'])
+@auth.login_required
 def get_data(city):
-    lat, lng = select_data(city)
-    # print(str(city) + ", " + str(lat) + ", " + str(lng))
     try:
-        uv = fetch_uv_data(lat, lng)
-        return uv, 200
+        lat, lng = select_data(city)
+        ext_api_data = retrieve_data(lat, lng)
+        return jsonify(ext_api_data), 200
     except:
-        return 404
+        return jsonify({'error':'city not found'}), 404
 
 
-
+# POST
 @app.route('/add', methods=['POST'])
+@auth.login_required
 def create_a_record():
-    if not request.json or not 'city' in request.json:
-        return jsonify({'error':'the city record needs to have a lat & long'}), 400
+    if not request.json or not all(k in request.json for k in ['city', 'lat', 'lng']):
+        return jsonify({'error':'the city record needs to have a city, lat & long'}), 400
     new_record = {
         'city': request.json['city'],
         'lat' : request.json.get('lat', ''),
@@ -42,7 +34,76 @@ def create_a_record():
     }
     insert_data(new_record['city'], new_record['lat'], new_record['lng'])
     return jsonify({'message':'new city created: /add/{} and lat:{}, lng:{}'.format(new_record['city'], new_record['lat'], new_record['lng'])}), 201
+
+
+# PUT
+@app.route('/edit', methods=['PUT']) 
+@auth.login_required
+def edit_record():
+    print(request.json)
+    if not request.json or not all(k in request.json for k in ['city', 'lat', 'lng']):
+        return jsonify({'error':'the city record needs to have a city, lat & long'}), 400
+    new_record = {
+        'city': request.json['city'],
+        'lat' : request.json.get('lat', ''),
+        'lng' : request.json.get('lng', ''),
+    }
+    
+    status = modify_record(new_record['city'], new_record['lat'], new_record['lng'])
+    
+    return jsonify({'success': status}), 201
+
+
+# DELETE
+@app.route('/delete/<city>', methods=['DELETE']) 
+@auth.login_required
+def delete_a_record(city): 
+    
+    status = delete_record(city)
+    if status:
+        return jsonify({'success': f'Deleted {city}'}), 200
+    else:    
+        return jsonify({'error': 'Record not found'}), 404     
+        
+        
+# POST
+@app.route('/add_user', methods=['POST'])
+@auth.login_required(role='admin')
+def create_a_user():
+    if not request.json or not all(k in request.json for k in ['userName', 'password', 'role']):
+        return jsonify({'error':'the new user needs to have userName, password, and role'}), 400
+    new_record = {
+        'userName': request.json.get('userName', ''),
+        'password' : request.json.get('password', ''),
+        'role' : request.json.get('role', ''),
+    }
+    insert_data(new_record['userName'], generate_password_hash(new_record['userName']), new_record['role'])
+    return jsonify({'message':'new user created'}), 201
+       
+        
+@auth.verify_password
+def authenticate(username, password):
+    role = 0
+    if username and password:       
+        account = select_user(username)       
+        if account and check_password_hash(account[0][1], password):
+            role = account[0][2]
+            return True
+        else:
+            return False
+    return False
+
+
+@auth.get_user_roles
+def get_user_roles(user):       
+    return role
+    
+    
+@auth.error_handler
+def unauthorized():
+    return jsonify({'error': 'Unauthorized access'}), 401
     
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=80, debug=True)
+    #app.run()
