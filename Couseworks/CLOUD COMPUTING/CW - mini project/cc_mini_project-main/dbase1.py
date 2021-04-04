@@ -3,6 +3,8 @@ import json
 import pymysql
 
 
+
+
 # Function return a connection.
 def getConnection():
     # You can change the connection arguments.
@@ -82,6 +84,8 @@ def modify_record(city, lat, lng):
         connection.close()
         return f'Created new record for {city}'
 
+
+
 def insert_user(userName, password, role):
     
     connection = getConnection()
@@ -91,8 +95,10 @@ def insert_user(userName, password, role):
     connection.commit()
     connection.close()
     
-       
+    
+    
 def select_user(userName):
+    
     connection = getConnection()
     cursor = connection.cursor()
     query = "SELECT Username, user_password, user_role FROM users WHERE Username like %s"
@@ -104,12 +110,7 @@ def select_user(userName):
 
 
 
+
 if __name__ == '__main__':
-    insert_data(city='Paris', lat=51.5074, lng=0.1278)
-    lat, lng = select_data('Paris')
-    print(lat, lng)
-    modify_record(city='Paris', lat=48.864716, lng=2.349014)
-    lat, lng = select_data('Paris')
-    print(lat, lng)
-    status = delete_record(city='Paris')
-    print(status)
+    # insert_uv_index(uv=1, uv_max=2, uv_max_time=3, uv_time=4)
+    select_data('Reading')

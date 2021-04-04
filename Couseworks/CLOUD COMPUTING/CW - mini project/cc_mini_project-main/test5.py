@@ -23,7 +23,7 @@ def index():
 @auth.get_user_roles
 def get_user_roles(user):
     
-    return 'admin1'
+    return 'admin'
 
 if __name__ == '__main__':
     app.run()

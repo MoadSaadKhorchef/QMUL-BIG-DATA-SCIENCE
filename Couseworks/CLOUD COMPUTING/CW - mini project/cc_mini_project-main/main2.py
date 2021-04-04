@@ -1,8 +1,9 @@
 from flask import Flask, jsonify, request
 from fetch_uv_data import fetch_uv_data, retrieve_data
-from dbase import select_data, insert_data, delete_record, modify_record, insert_user, select_user
+from dbase import select_data, modify_record, insert_data, delete_record, select_user, insert_user
 from flask_httpauth import HTTPBasicAuth
 from werkzeug.security import generate_password_hash, check_password_hash
+
 
 app = Flask(__name__)
 auth = HTTPBasicAuth()
@@ -37,7 +38,9 @@ def create_a_record():
 
 # PUT
 @app.route('/edit', methods=['PUT']) 
+@auth.login_required
 def edit_record():
+    print(request.json)
     if not request.json or not all(k in request.json for k in ['city', 'lat', 'lng']):
         return jsonify({'error':'the city record needs to have a city, lat & long'}), 400
     new_record = {
@@ -53,6 +56,7 @@ def edit_record():
 
 # DELETE
 @app.route('/delete/<city>', methods=['DELETE']) 
+@auth.login_required
 def delete_a_record(city): 
     
     status = delete_record(city)
@@ -60,7 +64,8 @@ def delete_a_record(city):
         return jsonify({'success': f'Deleted {city}'}), 200
     else:    
         return jsonify({'error': 'Record not found'}), 404     
-
+        
+        
 # POST
 @app.route('/add_user', methods=['POST'])
 #@auth.login_required(role='admin')
@@ -72,7 +77,7 @@ def create_a_user():
         'password' : request.json.get('password', ''),
         'role' : request.json.get('role', ''),
     }
-    insert_user(new_record['userName'], generate_password_hash(new_record['password']), new_record['role'])
+    insert_data(new_record['userName'], generate_password_hash(new_record['password']), new_record['role'])
     return jsonify({'message':'new user created'}), 201
        
         
@@ -80,8 +85,8 @@ def create_a_user():
 def authenticate(username, password):
     role = 0
     if username and password:       
-        account = select_user(username)  
-        if account and check_password_hash(account[1], password):
+        account = select_user(username)       
+        if account and check_password_hash(account[0][1], password):
             role = account[0][2]
             return True
         else:
@@ -97,7 +102,8 @@ def get_user_roles(user):
 @auth.error_handler
 def unauthorized():
     return jsonify({'error': 'Unauthorized access'}), 401
-      
+    
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=80, debug=True)
+    #app.run()
