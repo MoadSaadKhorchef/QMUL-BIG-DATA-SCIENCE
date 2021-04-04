@@ -6,7 +6,7 @@ def fetch_uv_data(lat=51.52369, lng=-0.0395857):
     uv_url_template ='https://api.openuv.io/api/v1/uv?lat={lat}&lng={lng}&dt={data}'
     start = arrow.utcnow()
     my_date = start.format('YYYY-MM-DD')
-    headers = {'x-access-token': os.environ.get('OPENUV_TOKEN')}
+    headers = {'x-access-token': '10d1164b1d5b4a643fe25e8c86a93062'}
     uv_url = uv_url_template.format(lat=lat, lng=lng, data=my_date)
     resp = requests.get(uv_url, headers=headers)
     
@@ -33,7 +33,7 @@ def get_weather_data(lat, lng):
         'end': end.timestamp()  # Convert to UTC timestamp
       },
       headers={
-        'Authorization': os.environ.get('WEATHER_TOKEN')
+        'Authorization': '9287cd42-8f13-11eb-a978-0242ac130002-9287cdb0-8f13-11eb-a978-0242ac130002'
       }
     )
 

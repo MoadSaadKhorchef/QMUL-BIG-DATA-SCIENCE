@@ -6,10 +6,10 @@ import pymysql
 # Function return a connection.
 def getConnection():
     # You can change the connection arguments.
-    connection = pymysql.connect(host=os.environ.get('DB_HOST'),
+    connection = pymysql.connect(host='db-uv-1.ckgdjcftth7u.us-east-1.rds.amazonaws.com',
                                  port=3306,
-                                 user=os.environ.get('DB_USER'),
-                                 password=os.environ.get('DB_PASS'),
+                                 user='admin',
+                                 password='12345678',
                                  database='openuv')
     return connection
 

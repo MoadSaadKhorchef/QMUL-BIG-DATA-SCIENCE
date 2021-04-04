@@ -63,7 +63,7 @@ def delete_a_record(city):
 
 # POST
 @app.route('/add_user', methods=['POST'])
-#@auth.login_required(role='admin')
+@auth.login_required(role='admin')
 def create_a_user():
     if not request.json or not all(k in request.json for k in ['userName', 'password', 'role']):
         return jsonify({'error':'the new user needs to have user name, password, and role'}), 400
@@ -82,15 +82,15 @@ def authenticate(username, password):
     if username and password:       
         account = select_user(username)  
         if account and check_password_hash(account[1], password):
-            role = account[0][2]
-            return True
+            role = account[2]
+            return role
         else:
             return False
     return False
 
 
 @auth.get_user_roles
-def get_user_roles(user):       
+def get_user_roles(role):       
     return role
     
     

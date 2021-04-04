@@ -1,0 +1,4 @@
+curl -u mehwish:qmul123 -i http://localhost/location/london/
+
+
+curl -u mehwish:qmul123 -i -H "Content-Type: application/json" -X POST -d "{\"userName\":\"Moee\", \"password\":\"qmul123\", \"role\":\"admin\"}" http://localhost/add_user
