@@ -1,0 +1,7 @@
+Flask
+arrow
+pymysql
+requests
+flask_httpauth
+gunicorn
+ngenx
